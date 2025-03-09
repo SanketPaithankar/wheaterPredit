@@ -65,6 +65,12 @@ st.subheader("Step 6: Save Cleaned Data")
 df.to_csv('rajbhavan_combined_cleaned_data.csv', index=False)
 st.write("Cleaned dataset saved successfully")
 
+#Coverting DataTypes
+# Convert 'Date & Time' column to datetime format
+df['Date & Time'] = pd.to_datetime(df['Date & Time'], errors='coerce')
+df = df.dropna(subset=['Date & Time'])
+df = df.sort_values(by='Date & Time')
+
 # 8. Plot Temperature Trends
 st.subheader("Step 7: Temperature Trends Over Time")
 plt.figure(figsize=(14, 7))
