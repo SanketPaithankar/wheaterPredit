@@ -10,6 +10,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import mean_squared_error, accuracy_score
 
+
+# Make Predictions
+# Use the selected model to make predictions based on user input and display the results on the screen.
+
 # Streamlit app
 st.title('Weather Prediction Using Machine Learning Algorithms:)')
 
@@ -17,8 +21,7 @@ st.title('Weather Prediction Using Machine Learning Algorithms:)')
 df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
 
 # Display the first few rows of the dataframe
-st.subheader("Sample Data")
-st.dataframe(df.head(5))  # This will correctly display the dataframe
+df.head(5)
 
 # Drop columns with more than 50% missing values
 threshold = len(df) * 0.5
@@ -29,8 +32,4 @@ for column in df.columns:
     if df[column].dtype == 'object':
         df[column] = df[column].fillna(df[column].mode()[0])
     else:
-        df[column] = df[column].fillna(df[column].mean())
-
-# Display cleaned data
-st.subheader("Cleaned Data Preview")
-st.dataframe(df.head(5))
+        df[column] = df[column].fillna(df[column].mean())  
