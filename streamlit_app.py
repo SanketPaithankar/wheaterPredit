@@ -29,7 +29,7 @@ df = pd.read_csv(DATA_URL)
 
 # Display first few rows
 st.subheader("Sample Data")
-st.write(df.head(5))
+st.write(df.head())
 
 # Data Preprocessing
 ## Handling Missing Values
