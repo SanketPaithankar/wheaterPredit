@@ -12,7 +12,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from windrose import WindroseAxes
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
@@ -27,14 +27,14 @@ st.title('Weather Prediction Using Machine Learning Algorithms')
 DATA_URL = 'https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv'
 df = pd.read_csv(DATA_URL)
 
-# Display first few rows (Before Cleaning)
-st.subheader("Raw Data (Before Cleaning)")
+# Standardize column names
+df.columns = df.columns.str.strip()
+
+# Display first few rows
+st.subheader("Sample Data")
 st.write(df.head())
 
 # Data Preprocessing
-## Convert Date & Time to datetime format
-df['Date & Time'] = pd.to_datetime(df['Date & Time'], errors='coerce')
-
 ## Handling Missing Values
 threshold = len(df) * 0.5  # Drop columns with more than 50% missing values
 df = df.dropna(thresh=threshold, axis=1)
@@ -49,55 +49,53 @@ for column in df.columns:
 # Drop duplicate entries
 df = df.drop_duplicates()
 
-# Convert numeric columns
+## Handling Outliers using IQR
 numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
-for col in numerical_columns:
-    df[col] = pd.to_numeric(df[col], errors='coerce')
+Q1 = df[numerical_columns].quantile(0.25, numeric_only=True)
+Q3 = df[numerical_columns].quantile(0.75, numeric_only=True)
+IQR = Q3 - Q1
+df = df.loc[~((df[numerical_columns] < (Q1 - 1.5 * IQR)) | 
+              (df[numerical_columns] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-# Drop rows with NaN values after conversion
-df = df.dropna()
-
-# Normalization
+## Normalization
 scaler = MinMaxScaler()
 df[numerical_columns] = scaler.fit_transform(df[numerical_columns])
 
-# Display cleaned dataset
-st.subheader("Cleaned Data (After Preprocessing)")
-st.write(df.head())
+# Convert Date & Time to datetime
+df['Date & Time'] = pd.to_datetime(df['Date & Time'], errors='coerce')
+df = df.dropna(subset=['Date & Time'])
+df = df.sort_values(by='Date & Time')
 
 # Data Visualization
 st.subheader("Data Visualizations")
 
-# Temperature Trends
+## Temperature Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Temp - C'], label='Temp - C', alpha=0.7)
-plt.plot(df['Date & Time'], df['High Temp - C'], label='High Temp - C', alpha=0.7)
-plt.plot(df['Date & Time'], df['Low Temp - C'], label='Low Temp - C', alpha=0.7)
+plt.plot(df['Date & Time'], df['Temp - C'], label='Temp - C')
+plt.plot(df['Date & Time'], df['High Temp - C'], label='High Temp - C')
+plt.plot(df['Date & Time'], df['Low Temp - C'], label='Low Temp - C')
 plt.xlabel('Date & Time')
-plt.ylabel('Temperature (°C)')
+plt.ylabel('Temperature (C)')
 plt.title('Temperature Trends Over Time')
-plt.xticks(rotation=45)
 plt.legend()
 st.pyplot(plt)
 
-# Humidity Trends
+## Humidity Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Hum - %'], label='Humidity - %', alpha=0.7)
-plt.plot(df['Date & Time'], df['Inside Hum - %'], label='Inside Hum - %', alpha=0.7)
+plt.plot(df['Date & Time'], df['Hum - %'], label='Humidity - %')
+plt.plot(df['Date & Time'], df['Inside Hum - %'], label='Inside Hum - %')
 plt.xlabel('Date & Time')
 plt.ylabel('Humidity (%)')
 plt.title('Humidity Trends Over Time')
-plt.xticks(rotation=45)
 plt.legend()
 st.pyplot(plt)
 
-# Rainfall Trends
+## Rainfall Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Rain - in'], label='Rainfall (in)', alpha=0.7)
+plt.plot(df['Date & Time'], df['Rain - in'], label='Rainfall (in)')
 plt.xlabel('Date & Time')
 plt.ylabel('Rainfall (in)')
 plt.title('Rainfall Trends Over Time')
-plt.xticks(rotation=45)
 plt.legend()
 st.pyplot(plt)
 
@@ -110,7 +108,6 @@ wind_direction_map = {
 }
 df['Wind_Direction_Degrees'] = df['Prevailing Wind Direction'].map(wind_direction_map)
 df = df.dropna(subset=['Wind_Direction_Degrees', 'Avg Wind Speed - km/h'])
-
 fig = plt.figure(figsize=(10, 10))
 ax = WindroseAxes.from_ax(fig=fig)
 ax.bar(df['Wind_Direction_Degrees'], df['Avg Wind Speed - km/h'], normed=False, opening=0.8, edgecolor='white')
