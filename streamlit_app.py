@@ -86,7 +86,7 @@ plt.ylabel('Humidity (%)')
 plt.title('Humidity Trends Over Time')
 plt.legend()
 st.pyplot(plt)
-
+st.write(df.head())
 ## Rainfall Trends
 plt.figure(figsize=(14, 7))
 plt.plot(df['Date & Time'], df['Rain - in'], label='Rainfall (in)')
