@@ -17,10 +17,12 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 # Streamlit app
 st.title('Weather Prediction Using Machine Learning Algorithms')
 
-df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
-
 # Read the CSV file
-df = pd.read_csv('rajbhavan_combined.csv')
+df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
 
 # Display the first few rows of the dataframe
 df.head(5)
+
+# Drop columns with more than 50% missing values
+threshold = len(df) * 0.5
+df = df.dropna(thresh=threshold, axis=1)
