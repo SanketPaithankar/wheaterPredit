@@ -77,9 +77,10 @@ plt.legend()
 st.pyplot(plt)
 
 ## Humidity Trends
+# Humidity Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Hum - %'], label='Humidity - %')
-plt.plot(df['Date & Time'], df['Inside Hum - %'], label='Inside Hum - %')
+plt.plot(df['Date & Time'], df['Hum - %'], label='Humidity - %')  # Ensure 'Hum - %' is the correct column name
+plt.plot(df['Date & Time'], df['Inside Hum - %'], label='Inside Hum - %')  # Ensure 'Inside Hum - %' is the correct column name
 plt.xlabel('Date & Time')
 plt.ylabel('Humidity (%)')
 plt.title('Humidity Trends Over Time')
