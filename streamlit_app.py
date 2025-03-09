@@ -19,3 +19,8 @@ st.title('Weather Prediction Using Machine Learning Algorithms')
 
 df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
 
+# Read the CSV file
+df = pd.read_csv('rajbhavan_combined.csv')
+
+# Display the first few rows of the dataframe
+df.head(5)
