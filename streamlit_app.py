@@ -5,74 +5,67 @@ This script processes weather data, performs data cleaning, visualizes trends,
 and implements machine learning models for weather prediction.
 """
 
+# Import necessary libraries
 import pandas as pd
 import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
+from windrose import WindroseAxes
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import mean_squared_error, accuracy_score
-from windrose import WindroseAxes
 
-# 1. Streamlit Application Title
+# Streamlit App Title
 st.title('Weather Prediction Using Machine Learning Algorithms')
 
-# 2. Load the Dataset
-st.subheader("Step 1: Load the Dataset")
-df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
-st.write("First 5 rows of the dataset:", df.head())
+# Load Dataset
+DATA_URL = 'https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv'
+df = pd.read_csv(DATA_URL)
 
-# 3. Handle Missing Values
-st.subheader("Step 2: Handling Missing Values")
-threshold = len(df) * 0.5
-st.write("Dropping columns with more than 50% missing values")
+# Display first few rows
+st.subheader("Sample Data")
+st.write(df.head())
+
+# Data Preprocessing
+## Handling Missing Values
+threshold = len(df) * 0.5  # Drop columns with more than 50% missing values
 df = df.dropna(thresh=threshold, axis=1)
 
+# Fill missing values
 for column in df.columns:
     if df[column].dtype == 'object':
         df[column] = df[column].fillna(df[column].mode()[0])
     else:
         df[column] = df[column].fillna(df[column].mean())
-st.write("Missing values handled successfully")
 
-# 4. Remove Duplicates
-st.subheader("Step 3: Removing Duplicate Rows")
+# Drop duplicate entries
 df = df.drop_duplicates()
-st.write("Duplicates removed")
 
-# 5. Handle Outliers using IQR
-st.subheader("Step 4: Handling Outliers Using IQR")
+## Handling Outliers using IQR
 numerical_columns = df.select_dtypes(include=['float64', 'int64']).columns
 Q1 = df[numerical_columns].quantile(0.25, numeric_only=True)
 Q3 = df[numerical_columns].quantile(0.75, numeric_only=True)
 IQR = Q3 - Q1
-df = df.loc[~((df[numerical_columns] < (Q1 - 1.5 * IQR)) | (df[numerical_columns] > (Q3 + 1.5 * IQR))).any(axis=1)]
-st.write("Outliers removed using IQR method")
+df = df.loc[~((df[numerical_columns] < (Q1 - 1.5 * IQR)) | 
+              (df[numerical_columns] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-# 6. Normalize Data
-st.subheader("Step 5: Normalizing Numerical Data")
+## Normalization
 scaler = MinMaxScaler()
 df[numerical_columns] = scaler.fit_transform(df[numerical_columns])
-st.write("Data normalization complete")
 
-# 7. Save Cleaned Data
-st.subheader("Step 6: Save Cleaned Data")
+# Save cleaned dataset
 df.to_csv('rajbhavan_combined_cleaned_data.csv', index=False)
-st.write("Cleaned dataset saved successfully")
 
-#Coverting DataTypes
-# Convert 'Date & Time' column to datetime format
-df['Date & Time'] = pd.to_datetime(df['Date & Time'], errors='coerce')
-df = df.dropna(subset=['Date & Time'])
-df = df.sort_values(by='Date & Time')
+# Data Visualization
+st.subheader("Data Visualizations")
 
-# 8. Plot Temperature Trends
-st.subheader("Step 7: Temperature Trends Over Time")
+## Temperature Trends
+df['Date & Time'] = pd.to_datetime(df['Date & Time'])
 plt.figure(figsize=(14, 7))
 plt.plot(df['Date & Time'], df['Temp -  C'], label='Temp - C')
 plt.plot(df['Date & Time'], df['High Temp -  C'], label='High Temp - C')
@@ -83,10 +76,9 @@ plt.title('Temperature Trends Over Time')
 plt.legend()
 st.pyplot(plt)
 
-# 9. Plot Humidity Trends
-st.subheader("Step 8: Humidity Trends Over Time")
+## Humidity Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Hum - %'], label='Hum - %')
+plt.plot(df['Date & Time'], df['Hum - %'], label='Humidity - %')
 plt.plot(df['Date & Time'], df['Inside Hum - %'], label='Inside Hum - %')
 plt.xlabel('Date & Time')
 plt.ylabel('Humidity (%)')
@@ -94,18 +86,17 @@ plt.title('Humidity Trends Over Time')
 plt.legend()
 st.pyplot(plt)
 
-# 10. Plot Rainfall Trends
-st.subheader("Step 9: Rainfall Trends Over Time")
+## Rainfall Trends
 plt.figure(figsize=(14, 7))
-plt.plot(df['Date & Time'], df['Rain - in'], label='Rain - in')
+plt.plot(df['Date & Time'], df['Rain - in'], label='Rainfall (in)')
 plt.xlabel('Date & Time')
 plt.ylabel('Rainfall (in)')
 plt.title('Rainfall Trends Over Time')
 plt.legend()
 st.pyplot(plt)
 
-# 11. Wind Rose Plot
-st.subheader("Step 10: Wind Rose Plot")
+# Wind Rose Plot
+st.subheader("Wind Rose Plot")
 wind_direction_map = {
     'N': 0, 'NNE': 22.5, 'NE': 45, 'ENE': 67.5, 'E': 90, 'ESE': 112.5, 'SE': 135,
     'SSE': 157.5, 'S': 180, 'SSW': 202.5, 'SW': 225, 'WSW': 247.5, 'W': 270,
@@ -120,4 +111,4 @@ ax.set_legend()
 plt.title('Wind Rose Plot - Frequency of Wind Direction')
 st.pyplot(fig)
 
-st.write("Weather Prediction Data Processing and Visualization Completed Successfully!")
+st.write("Dataset successfully cleaned, visualized, and ready for modeling!")
