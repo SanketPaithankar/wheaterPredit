@@ -26,3 +26,11 @@ df.head(5)
 # Drop columns with more than 50% missing values
 threshold = len(df) * 0.5
 df = df.dropna(thresh=threshold, axis=1)
+
+# Fill missing values
+for column in df.columns:
+    if df[column].dtype == 'object':
+        df[column] = df[column].fillna(df[column].mode()[0])
+    else:
+        df[column] = df[column].fillna(df[column].mean())
+
