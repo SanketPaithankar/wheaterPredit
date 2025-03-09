@@ -59,7 +59,6 @@ scaler = MinMaxScaler()
 df[numerical_columns] = scaler.fit_transform(df[numerical_columns])
 
 # Save cleaned dataset
-df.to_csv('rajbhavan_combined_cleaned_data.csv', index=False)
 
 # Data Visualization
 st.subheader("Data Visualizations")
