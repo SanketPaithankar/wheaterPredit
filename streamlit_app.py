@@ -15,7 +15,7 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 # Use the selected model to make predictions based on user input and display the results on the screen.
 
 # Streamlit app
-st.title('Weather Prediction Using Machine Learning Algorithms:)')
+st.title('Weather Prediction Using Machine Lefrdfedfearning Algorithms:)')
 
 # Read the CSV file
 df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
