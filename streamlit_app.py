@@ -18,4 +18,4 @@ from sklearn.metrics import mean_squared_error, accuracy_score
 st.title('Weather Prediction by Sejal and Riddhi')
 
 df = pd.read_csv('https://raw.githubusercontent.com/SanketPaithankar/wheaterPredit/refs/heads/main/rajbhavan_combined.csv')
-df.head();
+
